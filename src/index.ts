@@ -6,13 +6,21 @@ import { z } from "zod"
 import { UserModel } from "./db";
 const app=express();
 app.use(express.json())
-mongoose.connect(process.env.MONGO_URL as string)
+require ('dotenv').config()
+
+//Connecting to database
+async function main (){
+  await mongoose.connect(process.env.MONGO_URL as string)
+  app.listen(3000);
+  console.log("Listening to port 3000")
+}
+main();
 
 //Routes
 
 app.post("/api/v1/signup",async (req,res)=>{
   const requiredBody=z.object({
-    email:z.string().min(5).max(20).email(),
+    email:z.string().min(5).max(35).email(),
     password:z.string().min(8,{message:"Password must be atleast 8 characters"}).max(20,{message:"Password cannot exceed more than 20 characters"}).refine((val)=>
       /[a-z]/.test(val),{
       message:"The password must contain atleast 1 lowercase character"
@@ -44,7 +52,7 @@ app.post("/api/v1/signup",async (req,res)=>{
       const hashedPassword = await bcrypt.hash(password,5);
       await UserModel.create({
         email:email,
-        password:password,
+        password:hashedPassword,
         userName:userName
       }) 
     }

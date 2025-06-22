@@ -8,7 +8,7 @@ const UserSchema = new Schema({
   userName: String
 }) 
 
-export const UserModel= mongoose.model("Users", UserSchema)
+export const UserModel= mongoose.model("users", UserSchema)
 
 const TagSchema = new Schema({
   title:{type:String, required:true, unique:true}
