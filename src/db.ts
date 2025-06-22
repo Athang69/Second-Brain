@@ -3,6 +3,7 @@ const ObjectId= mongoose.Types.ObjectId;
 import { Model, Schema } from "mongoose";
 
 const UserSchema = new Schema({
+  userId:ObjectId,
   email: {type:String, required:true, unique:true},
   password: {type:String, required:true},
   userName: String

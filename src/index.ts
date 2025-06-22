@@ -6,11 +6,12 @@ import { z } from "zod"
 import { UserModel } from "./db";
 const app=express();
 app.use(express.json())
-require ('dotenv').config()
+import { MONGO_URL, JWT_SECRET } from "./config";
+
 
 //Connecting to database
 async function main (){
-  await mongoose.connect(process.env.MONGO_URL as string)
+  await mongoose.connect(MONGO_URL as string)
   app.listen(3000);
   console.log("Listening to port 3000")
 }
@@ -57,7 +58,7 @@ app.post("/api/v1/signup",async (req,res)=>{
       }) 
     }
     catch(e){
-      res.json({
+      res.status(411).json({
         message:"User already exists"
       })
       thrownError=true;
@@ -69,8 +70,36 @@ app.post("/api/v1/signup",async (req,res)=>{
     }
   })
 
-app.post("/api/v1/signin",(req,res)=>{
-
+app.post("/api/v1/signin", async (req,res)=>{
+  const email=req.body.email;
+  const password=req.body.password;
+  const user=await UserModel.findOne({
+    email:email
+  })
+  if(!user){
+    res.status(404).json({
+      message:"The user does not exist"
+    })
+    return
+  }
+  const passwordMatch= await bcrypt.compare(password,user.password)
+  console.log(user._id.toString());
+  if(passwordMatch){
+    const token=jwt.sign({
+      id:user._id.toString()
+    },JWT_SECRET);
+    res.json({
+      message:"You are logged in. The token is ",
+      token:token
+    })
+    return
+  }
+  else{
+    res.status(403).json({
+      message:"Invalid Login Credentials"
+    })
+    return
+  }
 })
 
 app.post("/api/v1/content",(req,res)=>{
