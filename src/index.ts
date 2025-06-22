@@ -3,10 +3,11 @@ import mongoose from "mongoose";
 import jwt from 'jsonwebtoken'
 import bcrypt from "bcrypt"
 import { z } from "zod"
-import { UserModel } from "./db";
+import { ContentModel, UserModel } from "./db";
 const app=express();
 app.use(express.json())
 import { MONGO_URL, JWT_SECRET } from "./config";
+import auth from "./middlewares/auth"
 
 
 //Connecting to database
@@ -83,7 +84,6 @@ app.post("/api/v1/signin", async (req,res)=>{
     return
   }
   const passwordMatch= await bcrypt.compare(password,user.password)
-  console.log(user._id.toString());
   if(passwordMatch){
     const token=jwt.sign({
       id:user._id.toString()
@@ -102,22 +102,53 @@ app.post("/api/v1/signin", async (req,res)=>{
   }
 })
 
-app.post("/api/v1/content",(req,res)=>{
+app.post("/api/v1/content", auth ,async (req,res)=>{
+  const title=req.body.title;
+  const link=req.body.link;
+  const tags=req.body.tags;
+
+  await ContentModel.create({
+    title,
+    link,
+    tags:[],
+    //@ts-ignore
+    userId:req.userId
+  })
+
+  res.status(200).json({
+    message:"Contents added"
+  })
+  return
+})
+
+app.get("/api/v1/content",auth, async(req,res)=>{
+  //@ts-ignore
+  const userId=req.userId;
+  const content = await ContentModel.find({
+    userId:userId
+  })
+  res.json({
+    content
+  })
+})
+
+app.delete("/api/v1/content",auth, async(req,res)=>{
+  const contentId=req.body.contentId;
+  await ContentModel.deleteOne({
+    _id:contentId,
+    //@ts-ignore
+    userId:req.userId
+  })
+  res.json({
+    message:"Content deleted successfully"
+  })
+  return
+})
+
+app.post("/api/v1/brain/share",auth, (req,res)=>{
 
 })
 
-app.get("/api/v1/content",(req,res)=>{
-
-})
-
-app.delete("/api/v1/content",(req,res)=>{
-
-})
-
-app.post("/api/v1/brain/share",(req,res)=>{
-
-})
-
-app.get("/api/v1/brain/shareLink",(req,res)=>{
+app.get("/api/v1/brain/shareLink",auth, (req,res)=>{
 
 })

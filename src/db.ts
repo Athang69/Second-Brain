@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 const ObjectId= mongoose.Types.ObjectId;
 import { Model, Schema } from "mongoose";
 
@@ -20,6 +20,15 @@ export const TagModel= mongoose.model("Tags", TagSchema)
 enum types{
 
 }
+
+const ContentSchema= new Schema({
+  title:String,
+  link:String,
+  tags:[{type:mongoose.Types.ObjectId, ref:"TagSchema"}],
+  userId:{type:mongoose.Types.ObjectId ,ref:"UserSchema", required:true}
+})
+
+export const ContentModel=mongoose.model("contents", ContentSchema);
 
 // const ContentSchema= new Schema ({
 //   link:String,
