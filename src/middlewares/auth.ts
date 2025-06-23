@@ -6,8 +6,7 @@ export default function auth(req:Request, res:Response, next:NextFunction){
   const token=req.headers["authorization"];
   const decodedData=jwt.verify(token as string ,JWT_SECRET)
   if(decodedData){
-    //@ts-ignore
-    req.userId=decodedData.id
+    req.userId=(decodedData as JwtPayload).id
     next();
   } else{
     res.status(403).json({

@@ -11,26 +11,18 @@ const UserSchema = new Schema({
 
 export const UserModel= mongoose.model("users", UserSchema)
 
-const TagSchema = new Schema({
-  title:{type:String, required:true, unique:true}
-})
+const LinkSchema = new Schema({
+  hash:String,
+  userId:{type:mongoose.Types.ObjectId, ref:"users", unique:true}
+}) 
 
-export const TagModel= mongoose.model("Tags", TagSchema)
-
-enum types{
-
-}
+export const LinkModel= mongoose.model("links", LinkSchema)
 
 const ContentSchema= new Schema({
   title:String,
   link:String,
   tags:[{type:mongoose.Types.ObjectId, ref:"TagSchema"}],
-  userId:{type:mongoose.Types.ObjectId ,ref:"UserSchema", required:true}
+  userId:{type:mongoose.Types.ObjectId ,ref:"users", required:true}
 })
 
 export const ContentModel=mongoose.model("contents", ContentSchema);
-
-// const ContentSchema= new Schema ({
-//   link:String,
-//   type:(String | types:enum) //Define an enum containing the tags 
-// })
