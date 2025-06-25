@@ -21,7 +21,7 @@ export const LinkModel= mongoose.model("links", LinkSchema)
 const ContentSchema= new Schema({
   title:String,
   link:String,
-  tags:[{type:mongoose.Types.ObjectId, ref:"TagSchema"}],
+  type:String,
   userId:{type:mongoose.Types.ObjectId ,ref:"users", required:true}
 })
 

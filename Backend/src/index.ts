@@ -10,8 +10,10 @@ import { MONGO_URL, JWT_SECRET } from "./config";
 import auth from "./middlewares/auth"
 import randon from "./util";
 import random from "./util";
+import cors from "cors"
+import { Request, Response } from "express";
 
-
+app.use(cors())
 //Connecting to database
 async function main (){
   await mongoose.connect(MONGO_URL as string)
@@ -107,12 +109,12 @@ app.post("/api/v1/signin", async (req,res)=>{
 app.post("/api/v1/content", auth ,async (req,res)=>{
   const title=req.body.title;
   const link=req.body.link;
-  const tags=req.body.tags;
+  const type=req.body.type
 
   await ContentModel.create({
     title,
     link,
-    tags:[],
+    type,
     //@ts-ignore
     userId:req.userId
   })
@@ -180,14 +182,12 @@ app.post("/api/v1/brain/share",auth, async (req,res)=>{
   
 })
 
-app.get("/api/v1/brain/:shareLink", async (req,res)=>{
-  //@ts-ignore
-  const hash=req.params.shareLink
 
+app.get("/api/v1/brain/:shareLink", async (req: Request<{ shareLink: string }>, res: Response) => {
+  const hash = parseInt(req.params.shareLink);
   const link = await LinkModel.findOne({
     hash
   })
-
   if(!link){
     res.status(404).json({
       message:"Incorrect input"
